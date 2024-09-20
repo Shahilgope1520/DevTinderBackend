@@ -26,26 +26,44 @@ const app = express();
 //   res.send("Data Deleted Succesfully");
 // });
 
-// app.listen(7777, () => {
-//   console.log("Server is running on port 7777");
-// });
+app.listen(7777, () => {
+  console.log("Server is running on port 7777");
+});
 
 
-app.get("/a(bc)*c", (req, res) => {
+// app.get("/a(bc)*c", (req, res) => {
+//     res.send({
+//       name: "Shahil",
+//       role: "F.E.",
+//     });
+//   });
+//   app.get(/a/,(req,res)=>{  // a in path and it will work
+//       res.send("a")
+//   })
+//   app.get(/.*fly$/,(req,res)=>{  // fly at end in path and it will work
+//       res.send("fly")
+//   })
+//   app.get("/user", (req, res) => {
+//     res.send({
+//       name: "Shahil",
+//       role: "F.E.",
+//     });
+//   });
+
+
+  app.get("/user/:id/:name", (req, res) => {
+    console.log('dynamic params', req?.params)
     res.send({
       name: "Shahil",
       role: "F.E.",
     });
   });
-  app.get(/a/,(req,res)=>{  // a in path and it will work
-      res.send("a")
-  })
-  app.get(/.*fly$/,(req,res)=>{  // fly at end in path and it will work
-      res.send("fly")
-  })
-  app.get("/user", (req, res) => {
+  app.get("/user", (req, res) => {  //http://localhost:7777/user?id=200&name=shahil
+    console.log('query params', req?.query)
     res.send({
       name: "Shahil",
       role: "F.E.",
     });
   });
+
+
