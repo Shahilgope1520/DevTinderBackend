@@ -19,14 +19,33 @@ const app = express();
 //     res.send("HAHAHAHA")
 // })
 
-app.post("/user", (req, res) => {
-  res.send("Data Sent Succesfully");
-});
-app.delete("/user", (req, res) => {
-  res.send("Data Deleted Succesfully");
-});
+// app.post("/user", (req, res) => {
+//   res.send("Data Sent Succesfully");
+// });
+// app.delete("/user", (req, res) => {
+//   res.send("Data Deleted Succesfully");
+// });
 
-app.listen(7777, () => {
-  console.log("Server is running on port 7777");
-});
+// app.listen(7777, () => {
+//   console.log("Server is running on port 7777");
+// });
 
+
+app.get("/a(bc)*c", (req, res) => {
+    res.send({
+      name: "Shahil",
+      role: "F.E.",
+    });
+  });
+  app.get(/a/,(req,res)=>{  // a in path and it will work
+      res.send("a")
+  })
+  app.get(/.*fly$/,(req,res)=>{  // fly at end in path and it will work
+      res.send("fly")
+  })
+  app.get("/user", (req, res) => {
+    res.send({
+      name: "Shahil",
+      role: "F.E.",
+    });
+  });
