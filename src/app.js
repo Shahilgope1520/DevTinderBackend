@@ -6,6 +6,48 @@ const { User } = require("./model/user");
 const app = express();
 
 app.use(express.json());
+
+app.delete("/user", async (req, res) => {
+  const userId = req?.body?.id;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    console.log("user", user);
+    res.send("user deleted succesfully");
+  } catch (err) {
+    res.status(500).send("Something went wrong" + err.message);
+  }
+});
+app.patch("/user", async (req, res) => {
+  const userId = req?.body?.id;
+  const data = req?.body;
+  try {
+    const user = await User.findByIdAndUpdate(userId, data);
+    console.log("user", user);
+    if (user) {
+      res.send("user updated succesfully");
+    } else {
+      res.status(401).send("user not found");
+    }
+  } catch (err) {
+    res.status(500).send("Something went wrong" + err.message);
+  }
+});
+app.patch("/updateUserByEmailId", async (req, res) => {
+  const email = req?.body?.email;
+  try {
+    const user = await User.findOneAndUpdate({ email }, req?.body, {
+      returnDocument: "before",
+    });
+    console.log('user', user)
+    if (user) {
+      res.send(`email: ${user?.email} update succesfully`);
+    } else {
+      res.status(401).send("No user found");
+    }
+  } catch (err) {
+    res.status(500).send("Something went wrong" + err.message);
+  }
+});
 app.get("/userByField", async (req, res) => {
   try {
     const user = await User.findOne({ email: req?.body?.email });
@@ -23,7 +65,7 @@ app.get("/userById", async (req, res) => {
     const userById = await User.findById(req.body.id, "firstName");
     res.send(userById);
   } catch (err) {
-    res.status(500).send("Something went wrong" );
+    res.status(500).send("Something went wrong");
   }
 });
 app.get("/feed", async (req, res) => {
