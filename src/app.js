@@ -4,18 +4,15 @@ const { connectDb } = require("./config/database");
 const { User } = require("./model/user");
 
 const app = express();
-app.get('/users',(req,res)=>{
-  res.send("hello")
+
+app.use(express.json())
+app.get("/user",(req,res)=>{
+  res.send("hello user")
 })
 
 app.post("/signup", async(req, res) => {
-  const user = new User({
-    // firstName: "Shahil", // throw error first name is required
-    lastName: "Gope",
-    email: "shahil@gmail.com",
-    password: "1234",
-    gender: "male",
-  });
+  console.log(req.body)
+  const user = new User(req.body);
   try {
     await user.save();
     res.status(200).send("Created Successfully");
