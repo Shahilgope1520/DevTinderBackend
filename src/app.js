@@ -21,7 +21,7 @@ app.patch("/user", async (req, res) => {
   const userId = req?.body?.id;
   const data = req?.body;
   try {
-    const user = await User.findByIdAndUpdate(userId, data);
+    const user = await User.findByIdAndUpdate(userId, data, {runValidators:true});
     console.log("user", user);
     if (user) {
       res.send("user updated succesfully");
@@ -36,9 +36,8 @@ app.patch("/updateUserByEmailId", async (req, res) => {
   const email = req?.body?.email;
   try {
     const user = await User.findOneAndUpdate({ email }, req?.body, {
-      returnDocument: "before",
+      returnDocument: "before",runValidators:true
     });
-    console.log('user', user)
     if (user) {
       res.send(`email: ${user?.email} update succesfully`);
     } else {
@@ -79,13 +78,13 @@ app.get("/feed", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   console.log(req.body);
-  const user = new User(req.body);
   try {
+    const user = new User(req.body);
     await user.save();
     res.status(200).send("Created Successfully");
     console.log("Created Successfully");
   } catch (err) {
-    res.status(400).send("Unauthorized" + err.message);
+    res.status(400).send("Unauthorized " + err.message);
     console.log("Unauthorized");
   }
 });
