@@ -1,6 +1,8 @@
 const express = require("express");
 const { authUser } = require("./middleware/auth");
 const { connectDb } = require("./config/database");
+const {validateSignup} =require("./utils/validation")
+const bcrypt = require("bcrypt")
 const { User } = require("./model/user");
 
 const app = express();
@@ -39,7 +41,7 @@ app.patch("/user/:id", async (req, res) => {
     }
     const user = await User.findByIdAndUpdate(userId, data, {
       runValidators: true,
-      new:true
+      new: true,
     });
     console.log("user", user);
     if (user) {
@@ -100,15 +102,21 @@ app.get("/feed", async (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body);
   try {
-    const user = new User(req.body);
+    validateSignup(req);
+    const { password, email, lastName, firstName, gender } = req?.body;
+    const passwordHash = await bcrypt.hash(password, 10); // 10 salt rounds
+    const user = new User({
+      password: passwordHash,
+      email,
+      lastName,
+      firstName,
+      gender
+    });
     await user.save();
     res.status(200).send("Created Successfully");
-    console.log("Created Successfully");
   } catch (err) {
     res.status(400).send("Unauthorized " + err.message);
-    console.log("Unauthorized");
   }
 });
 connectDb()
