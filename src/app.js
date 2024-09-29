@@ -1,13 +1,36 @@
 const express = require("express");
 const { authUser } = require("./middleware/auth");
 const { connectDb } = require("./config/database");
-const {validateSignup} =require("./utils/validation")
-const bcrypt = require("bcrypt")
+const { validateSignup } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 const { User } = require("./model/user");
+const validator =require("validator")
 
 const app = express();
 
 app.use(express.json());
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req?.body;
+    if (!validator.isEmail(email)) {
+      throw new Error("Invalid email addresss");
+    }
+    const user = await User.findOne({ email: email });
+    console.log("user", user);
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+    isValidUser = bcrypt.compare(password, user?.password);
+    if (isValidUser) {
+      res.send("Login Sucessfull");
+    } else {
+      throw new Error("Invalid Credentials");
+    }
+  } catch (err) {
+    res.status(500).send("Something went wrong " + err.message);
+  }
+});
 
 app.delete("/user", async (req, res) => {
   const userId = req?.body?.id;
@@ -111,7 +134,7 @@ app.post("/signup", async (req, res) => {
       email,
       lastName,
       firstName,
-      gender
+      gender,
     });
     await user.save();
     res.status(200).send("Created Successfully");
