@@ -17,26 +17,49 @@ app.delete("/user", async (req, res) => {
     res.status(500).send("Something went wrong" + err.message);
   }
 });
-app.patch("/user", async (req, res) => {
-  const userId = req?.body?.id;
-  const data = req?.body;
+app.patch("/user/:id", async (req, res) => {
+  console.log("params", req?.params?.id);
   try {
-    const user = await User.findByIdAndUpdate(userId, data, {runValidators:true});
+    const approvedFields = ["firstName", "lastName", "skills", "dp", "gender"];
+    const userId = req?.params?.id;
+    const data = req?.body;
+    const invalidFields = Object.keys(data).filter(
+      (key) => !approvedFields.includes(key)
+    );
+
+    if (invalidFields.length > 0) {
+      return res
+        .status(400)
+        .send(`Cannot update fields: ${invalidFields.join(", ")}`);
+    }
+
+    // Check if 'skills' array exceeds allowed limit
+    if (data.skills && data.skills.length > 5) {
+      return res.status(400).send("Maximum 5 skills allowed");
+    }
+    const user = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+      new:true
+    });
     console.log("user", user);
     if (user) {
-      res.send("user updated succesfully");
+      res.send({
+        message: "User updated successfully",
+        updatedUser: user, // Send the updated user data
+      });
     } else {
-      res.status(401).send("user not found");
+      res.status(404).send("user not found");
     }
   } catch (err) {
-    res.status(500).send("Something went wrong" + err.message);
+    res.status(500).send("Something went wrong " + err.message);
   }
 });
 app.patch("/updateUserByEmailId", async (req, res) => {
   const email = req?.body?.email;
   try {
     const user = await User.findOneAndUpdate({ email }, req?.body, {
-      returnDocument: "before",runValidators:true
+      returnDocument: "before",
+      runValidators: true,
     });
     if (user) {
       res.send(`email: ${user?.email} update succesfully`);

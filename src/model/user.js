@@ -22,7 +22,7 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true,
       index: true,
-      unique: true, 
+      unique: true,
       validate: {
         validator: (v) => {
           return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -30,9 +30,15 @@ const userSchema = new Schema(
         message: (props) => `${props.value} is not a valid email address!`,
       },
     },
-    skills:{
-      type:[String],
-      default:[]
+    skills: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (value) => {
+          return Array.isArray(value) && new Set(value).size === value?.length;
+        },
+        message: "Skills should be unique",
+      },
     },
     dp: {
       type: String,
@@ -57,7 +63,7 @@ const userSchema = new Schema(
       },
     },
   },
-  { strict: true, timestamps:true }
+  { strict: true, timestamps: true }
 );
 
 const User = mongoose.model("user", userSchema);
