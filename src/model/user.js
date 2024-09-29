@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validator = require('validator');
 const { Schema } = mongoose;
 const userSchema = new Schema(
   {
@@ -23,12 +24,18 @@ const userSchema = new Schema(
       trim: true,
       index: true,
       unique: true,
-      validate: {
-        validator: (v) => {
-          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-        },
-        message: (props) => `${props.value} is not a valid email address!`,
-      },
+      // validate: {
+      //   validator: (v) => {
+      //     return validator.isEmail(v);
+      //   },
+      //   message: (props) => `${props.value} is not a valid email address!`,
+      // },
+      validate(value){
+        if(!validator.isEmail(value)){
+          throw new Error(`${value} is not a valid email address!`);
+          
+        }
+      }
     },
     skills: {
       type: [String],
@@ -45,6 +52,12 @@ const userSchema = new Schema(
       default:
         "https://t4.ftcdn.net/jpg/02/44/43/69/360_F_244436923_vkMe10KKKiw5bjhZeRDT05moxWcPpdmb.jpg",
       trim: true,
+      validate(value){
+        if(!validator.isURL(value)){
+          throw new Error(`${value} is not a valid url!`);
+          
+        }
+      }
     },
     password: {
       type: String,
