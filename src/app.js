@@ -1,14 +1,16 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { User } = require("./model/user");
+const validator = require("validator");
 const { authUser } = require("./middleware/auth");
 const { connectDb } = require("./config/database");
 const { validateSignup } = require("./utils/validation");
-const bcrypt = require("bcrypt");
-const { User } = require("./model/user");
-const validator =require("validator")
 
 const app = express();
-
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/login", async (req, res) => {
   try {
@@ -17,12 +19,14 @@ app.post("/login", async (req, res) => {
       throw new Error("Invalid email addresss");
     }
     const user = await User.findOne({ email: email });
-    console.log("user", user);
     if (!user) {
       throw new Error("Invalid Credentials");
     }
-    isValidUser = bcrypt.compare(password, user?.password);
+    const isValidUser = user.isValidUser(password);
     if (isValidUser) {
+      const { _id } = user;
+      const token = await user.getJwtToken();
+      res.cookie("token", token,{ expires: new Date(Date.now() + 90000)});
       res.send("Login Sucessfull");
     } else {
       throw new Error("Invalid Credentials");
@@ -30,6 +34,20 @@ app.post("/login", async (req, res) => {
   } catch (err) {
     res.status(500).send("Something went wrong " + err.message);
   }
+});
+
+app.get("/profile", authUser, async (req, res) => {
+  try {
+    const user = res?.user;
+    res.send(user);
+  } catch (err) {
+    res.status(500).send("Something went wrong " + err.message);
+  }
+});
+
+app.post("/sendConnection", authUser, (req, res) => {
+  console.log(res?.user)
+  res.send(`connection sent by ${res?.user?.firstName}`)
 });
 
 app.delete("/user", async (req, res) => {
@@ -66,7 +84,6 @@ app.patch("/user/:id", async (req, res) => {
       runValidators: true,
       new: true,
     });
-    console.log("user", user);
     if (user) {
       res.send({
         message: "User updated successfully",

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const validator = require('validator');
+const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const bycrypt = require("bcrypt");
 const { Schema } = mongoose;
 const userSchema = new Schema(
   {
@@ -30,12 +32,11 @@ const userSchema = new Schema(
       //   },
       //   message: (props) => `${props.value} is not a valid email address!`,
       // },
-      validate(value){
-        if(!validator.isEmail(value)){
+      validate(value) {
+        if (!validator.isEmail(value)) {
           throw new Error(`${value} is not a valid email address!`);
-          
         }
-      }
+      },
     },
     skills: {
       type: [String],
@@ -52,12 +53,11 @@ const userSchema = new Schema(
       default:
         "https://t4.ftcdn.net/jpg/02/44/43/69/360_F_244436923_vkMe10KKKiw5bjhZeRDT05moxWcPpdmb.jpg",
       trim: true,
-      validate(value){
-        if(!validator.isURL(value)){
+      validate(value) {
+        if (!validator.isURL(value)) {
           throw new Error(`${value} is not a valid url!`);
-          
         }
-      }
+      },
     },
     password: {
       type: String,
@@ -78,6 +78,18 @@ const userSchema = new Schema(
   },
   { strict: true, timestamps: true }
 );
+userSchema.methods.getJwtToken = function () {
+  const user = this;
+  const { _id } = user;
+  const token = jwt.sign({ _id }, "DevTinder@1$52", { expiresIn: "7d" });
+  return token;
+};
+
+userSchema.methods.isValidUser = function (password) {
+  const passwordHash = this?.password;
+  const isValidUser = bycrypt.compare(password, passwordHash);
+  return isValidUser;
+};
 
 const User = mongoose.model("user", userSchema);
 module.exports = { User };
