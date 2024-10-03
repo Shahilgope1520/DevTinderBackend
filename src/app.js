@@ -14,7 +14,7 @@ app.use(cookieParser());
 
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req?.body;
+    const { email, password } = req.body;
     if (!validator.isEmail(email)) {
       throw new Error("Invalid email addresss");
     }
