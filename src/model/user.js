@@ -85,9 +85,11 @@ userSchema.methods.getJwtToken = function () {
   return token;
 };
 
-userSchema.methods.isValidUser = function (password) {
+userSchema.methods.isValidUser =  async function (password) {
   const passwordHash = this?.password;
-  const isValidUser = bycrypt.compare(password, passwordHash);
+  console.log('passwordHash', passwordHash,password)
+  const isValidUser = await bycrypt.compare(password, passwordHash);
+  console.log('isValidUser', isValidUser)
   return isValidUser;
 };
 
