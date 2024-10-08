@@ -22,7 +22,7 @@ const authUser = async (req, res, next) => {
     if (!user) {
       throw new Error("User not found, Login again");
     }
-    res.user = user;
+    req.user = user;
     next();
   } catch (err) {
     res.status(500).send("Something went wrong " + err.message);

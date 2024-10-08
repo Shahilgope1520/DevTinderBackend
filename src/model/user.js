@@ -41,14 +41,28 @@ const userSchema = new Schema(
     skills: {
       type: [String],
       default: [],
-      validate: {
-        validator: (value) => {
-          return Array.isArray(value) && new Set(value).size === value?.length;
+      validate: [
+        {
+          validator: function (value) {
+            return Array.isArray(value);
+          },
+          message: "Skills should be an array.",
         },
-        message: "Skills should be unique",
-      },
+        {
+          validator: function (value) {
+            return new Set(value).size === value.length;
+          },
+          message: "Skills should be unique.",
+        },
+        {
+          validator: function (value) {
+            return value.length <= 5;
+          },
+          message: "You can only have up to 5 skills.",
+        }
+      ]
     },
-    dp: {
+    profileImage: {
       type: String,
       default:
         "https://t4.ftcdn.net/jpg/02/44/43/69/360_F_244436923_vkMe10KKKiw5bjhZeRDT05moxWcPpdmb.jpg",
@@ -62,7 +76,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, "Password is required"],
-      trim: true,
+      trim: true,   
     },
     gender: {
       type: String,
@@ -87,11 +101,11 @@ userSchema.methods.getJwtToken = function () {
 
 userSchema.methods.isValidUser =  async function (password) {
   const passwordHash = this?.password;
-  console.log('passwordHash', passwordHash,password)
   const isValidUser = await bycrypt.compare(password, passwordHash);
   console.log('isValidUser', isValidUser)
   return isValidUser;
 };
+
 
 const User = mongoose.model("user", userSchema);
 module.exports = { User };

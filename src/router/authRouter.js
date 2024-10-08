@@ -1,8 +1,8 @@
 const express = require("express");
-const validator =require("validator")
-const bcrypt =require("bcrypt")
+const validator = require("validator");
+const bcrypt = require("bcrypt");
 const { User } = require("../model/user");
-const {validateSignup} =require("../utils/validation")
+const { validateSignup } = require("../utils/validation");
 
 const authRouter = express.Router();
 
@@ -28,6 +28,12 @@ authRouter.post("/login", async (req, res) => {
     res.status(500).send("Something went wrong " + err.message);
   }
 });
+
+authRouter.post("/logout", (req, res) => {
+  res.clearCookie("token", null);
+  res.send("Logout succesfully!");
+});
+
 
 authRouter.post("/signup", async (req, res) => {
   try {
