@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const { User } = require("./model/user");
+const {ConnectionRequest} =require("./model/connectionRequest")
 const authRouter =require("./router/authRouter")
 const profileRouter = require("./router/profileRouter");
 const connectionRouter = require("./router/connectionRouter")
